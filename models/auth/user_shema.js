@@ -21,7 +21,8 @@ const userSchema = new mongoose.Schema({
     location:String,
     website:String,
     openToWork:{type:Boolean,default:false},
-    userStatus:{type:Boolean,default:true}
+    userStatus:{type:Boolean,default:true},
+    createdDate:{type:Date,default:Date.now()},
     
 },
 {timestamps:true});

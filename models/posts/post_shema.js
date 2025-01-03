@@ -14,10 +14,22 @@ const post_shema=post_shema=new mongoose.Schema({
     createdDate:{
         type:Date(),
         default:Date.now(),
-    }
+    },
+    likes:[
+        {
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"User"
+        }
+    ],
+    comments:[
+        {
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"Comment"
+        }
+    ]
 },
 {
     timestamps:true
 })
-mongoose.model={};
+mongoose.models={};
 export default mongoose.model("Post",post_shema);
