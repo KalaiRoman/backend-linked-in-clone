@@ -6,13 +6,23 @@ const userSchema = new mongoose.Schema({
     password: { type: String }, 
     role: { type: String, enum: ["admin", "user"], default: "user" },
     avatar: { type: String },
+    backgroundImg:{type:String},
     connectUsers: [
         {
             type: mongoose.Schema.Types.ObjectId, 
             ref: "User" 
         }
     ],
-    status: { type: String, default: "active", enum: ["active", "inactive"] }
+    educationDetails:{type:Array,default:[]},
+    skills:{type:Array,default:[]},
+    aboutYourProfile:{type:String,default:""},
+    status: { type: String, default: "active", enum: ["active", "inactive"] },
+    jobTitle:{type:String},
+    location:String,
+    website:String,
+    openToWork:{type:Boolean,default:false},
+    userStatus:{type:Boolean,default:true}
+    
 },
 {timestamps:true});
 const User = mongoose.model("User", userSchema);
