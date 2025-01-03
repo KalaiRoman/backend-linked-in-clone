@@ -4,6 +4,9 @@ import codes from "../../const/statusCodes.js";
 import {passwordGenerate} from "../../lib/bcryptPassword.js";
 import { TokenGenerate } from "../../lib/TokenGenerate.js";
 import User from "../../models/auth/user_shema.js";
+
+
+// create user
 export const CreateUser = async (req, res, next) => {
     try {
         const { userName, phoneNo, email, password, role, avatar, connectUsers, status } = req.body;
@@ -46,6 +49,7 @@ export const CreateUser = async (req, res, next) => {
     }
 };
 
+// login user
 export const Login = async (req, res, next) => {
     try {
         const { userNameOrEmailId, password } = req.body;
@@ -71,7 +75,7 @@ export const Login = async (req, res, next) => {
     }
 };  
 
-// get users details
+// get user
 export const getUser = async (req, res) => {
     try {
         const currentUserDetail=await User.findById({_id:req.user?._id});
@@ -87,7 +91,7 @@ export const getUser = async (req, res) => {
     }
 }; 
 
-// user Update Profile
+// update user
 export const UpdateUser = async (req, res) => {
     try {
         
@@ -105,7 +109,9 @@ export const UpdateUser = async (req, res) => {
         return res.status(500).json({ message: codes?.InternalServerError?.message });
     }
 }; 
-// image change profie
+
+
+// image upload
 export const changeProfilePic=async(req,res)=>{
     try {
         const updateImage=await User.findByIdAndUpdate({_id:req.user?._id},{avatar:req.file.path},{new:true});
