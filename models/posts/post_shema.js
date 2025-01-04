@@ -36,7 +36,11 @@ const post_shema=new mongoose.Schema({
                 required:true
                }
         }
-    ]
+    ],
+    postShow:{
+        type:Boolean,
+        default:true
+    }
 },
 {
     timestamps:true

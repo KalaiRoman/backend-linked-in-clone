@@ -118,7 +118,6 @@ export const changeProfilePic=async(req,res)=>{
         updateImage.password=undefined;
         res.status(200).json({message:"Profile Image Updated",user:updateImage});
     } catch (error) {
-        console.log(error);
         return res.status(500).json({ message: codes?.InternalServerError?.message });
     }
 }
@@ -155,7 +154,6 @@ export const favoritePosts = async (req, res) => {
             favoritePost: updatedUser.favoritePost,
         });
     } catch (error) {
-        console.error("Error toggling favorite post:", error);
         res.status(500).json({ message: "Internal server error." });
     }
 };
@@ -180,14 +178,46 @@ export const followUser = async (req, res) => {
         if (findUser.connectionRequest.includes(followId)) {
             findUser.connectionRequest.pull(followId);
             await findUser.save(); 
-            return res.status(200).json({ message: "Unfollowed the user successfully" });
+            return res.status(200).json({ message: "unRequest the user successfully" });
         } else {
             findUser.connectionRequest.push(followId);
             await findUser.save(); 
-            return res.status(200).json({ message: "Followed the user successfully" });
+            return res.status(200).json({ message: "Request the user successfully" });
         }
     } catch (error) {
-        console.error("Error following user:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+
+
+export const connectUser = async (req, res) => {
+    try {
+        const userId = req.user?._id;
+        const followId = req.params.id;
+        const objectId = new mongoose.Types.ObjectId(followId);
+        if (userId.equals(objectId)) {
+            return res.status(400).json({ message: "You can't follow yourself" });
+        }
+
+        const findUser = await User.findById(userId);
+        if (!findUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (findUser.connectedUsers.includes(followId)) {
+
+           
+            findUser.connectedUsers.pull(followId);
+            await findUser.save(); 
+            return res.status(200).json({ message: "unConnected the user successfully" });
+        } else {
+            findUser.connectedUsers.push(followId);
+            findUser.connectionRequest.pull(followId);
+            await findUser.save(); 
+            return res.status(200).json({ message: "Connected the user successfully" });
+        }
+    } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
 };
