@@ -4,7 +4,7 @@ import codes from "../../const/statusCodes.js";
 import {passwordGenerate} from "../../lib/bcryptPassword.js";
 import { TokenGenerate } from "../../lib/TokenGenerate.js";
 import User from "../../models/auth/user_shema.js";
-
+import mongoose from "mongoose";
 
 // create user
 export const CreateUser = async (req, res, next) => {
@@ -78,7 +78,7 @@ export const Login = async (req, res, next) => {
 // get user
 export const getUser = async (req, res) => {
     try {
-        const currentUserDetail=await User.findById({_id:req.user?._id}).populate("favoritePost","user title description image likes comments ").select("-password");
+        const currentUserDetail=await User.findById({_id:req.user?._id}).populate("favoritePost","user title description image likes comments").populate("connectionRequest","userName email avatar openToWork userStatus location ").select("-password");
         if(currentUserDetail)
         {
  return res.status(200).json({message:"Success",user:currentUserDetail});
@@ -157,5 +157,37 @@ export const favoritePosts = async (req, res) => {
     } catch (error) {
         console.error("Error toggling favorite post:", error);
         res.status(500).json({ message: "Internal server error." });
+    }
+};
+
+
+// user follow and unfollow
+
+export const followUser = async (req, res) => {
+    try {
+        const userId = req.user?._id;
+        const followId = req.params.id;
+        const objectId = new mongoose.Types.ObjectId(followId);
+        if (userId.equals(objectId)) {
+            return res.status(400).json({ message: "You can't follow yourself" });
+        }
+
+        const findUser = await User.findById(userId);
+        if (!findUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (findUser.connectionRequest.includes(followId)) {
+            findUser.connectionRequest.pull(followId);
+            await findUser.save(); 
+            return res.status(200).json({ message: "Unfollowed the user successfully" });
+        } else {
+            findUser.connectionRequest.push(followId);
+            await findUser.save(); 
+            return res.status(200).json({ message: "Followed the user successfully" });
+        }
+    } catch (error) {
+        console.error("Error following user:", error);
+        return res.status(500).json({ message: "Internal server error" });
     }
 };

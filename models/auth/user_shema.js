@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
     role: { type: String, enum: ["admin", "user"], default: "user" },
     avatar: { type: String },
     backgroundImg:{type:String},
-    connectUsers: [
+    connectedUsers: [
         {
             type: mongoose.Schema.Types.ObjectId, 
             ref: "User" 
@@ -28,7 +28,19 @@ const userSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId, 
             ref: "Post"
         }
-    ]
+    ],
+    connectionRequest:[
+        {
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: "User"
+        }
+    ],
+    rejectRequest:[
+        {
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: "User"
+        }
+    ],
     
 },
 {timestamps:true});
