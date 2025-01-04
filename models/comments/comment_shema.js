@@ -11,12 +11,16 @@ const comment_shema=new mongoose.Schema({
     },
     image:{
         type:String,
-default:"",
+        default:"",
     },
-    createdDate:{
-        type:Date(),
-        default:Date.now(),
+    userType:{
+        type:String,
+        required:true
     },
+    post:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Post"
+    }
 },
 {
     timestamps:true

@@ -23,6 +23,12 @@ const userSchema = new mongoose.Schema({
     openToWork:{type:Boolean,default:false},
     userStatus:{type:Boolean,default:true},
     createdDate:{type:Date,default:Date.now()},
+    favoritePost:[
+        {
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: "Post"
+        }
+    ]
     
 },
 {timestamps:true});

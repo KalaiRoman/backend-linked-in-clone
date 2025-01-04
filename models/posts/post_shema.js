@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const post_shema=post_shema=new mongoose.Schema({
+const post_shema=new mongoose.Schema({
     user:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User",
@@ -11,10 +11,6 @@ const post_shema=post_shema=new mongoose.Schema({
         type:String,
         default:""
     },
-    createdDate:{
-        type:Date(),
-        default:Date.now(),
-    },
     likes:[
         {
             type:mongoose.Schema.Types.ObjectId,
@@ -23,8 +19,22 @@ const post_shema=post_shema=new mongoose.Schema({
     ],
     comments:[
         {
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"Comment"
+            user:{
+                   type:mongoose.Schema.Types.ObjectId,
+                   ref:"User"
+               },
+               message:{
+                   type:String,
+                   required:true
+               },
+               image:{
+                   type:String,
+                   default:"",
+               },
+               userType:{
+                type:String,
+                required:true
+               }
         }
     ]
 },

@@ -78,7 +78,7 @@ export const Login = async (req, res, next) => {
 // get user
 export const getUser = async (req, res) => {
     try {
-        const currentUserDetail=await User.findById({_id:req.user?._id});
+        const currentUserDetail=await User.findById({_id:req.user?._id}).populate("favoritePost","user title description image likes comments ").select("-password");
         if(currentUserDetail)
         {
  return res.status(200).json({message:"Success",user:currentUserDetail});
@@ -122,3 +122,40 @@ export const changeProfilePic=async(req,res)=>{
         return res.status(500).json({ message: codes?.InternalServerError?.message });
     }
 }
+
+// image upload
+export const favoritePosts = async (req, res) => {
+    try {
+        const userId = req.user?._id; 
+        const postId = req.params.id; 
+
+        if (!userId || !postId) {
+            return res.status(400).json({ message: "User ID or Post ID is missing." });
+        }
+
+      
+        const user = await User.findById(userId); 
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        const isFavorite = user.favoritePost?.includes(postId); 
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            {
+                [isFavorite ? "$pull" : "$push"]: { favoritePost: postId }, 
+            },
+            { new: true }
+        ).select("-password"); 
+
+        res.status(200).json({
+            message: isFavorite
+                ? "Post removed from favorites successfully."
+                : "Post added to favorites successfully.",
+            favoritePost: updatedUser.favoritePost,
+        });
+    } catch (error) {
+        console.error("Error toggling favorite post:", error);
+        res.status(500).json({ message: "Internal server error." });
+    }
+};
