@@ -5,7 +5,7 @@ import {passwordGenerate} from "../../lib/bcryptPassword.js";
 import { TokenGenerate } from "../../lib/TokenGenerate.js";
 import User from "../../models/auth/user_shema.js";
 import mongoose from "mongoose";
-
+import bcrypt from 'bcrypt';
 // create user
 export const CreateUser = async (req, res, next) => {
     try {
@@ -31,6 +31,9 @@ export const CreateUser = async (req, res, next) => {
             return res.status(400).json({ message: auth?.mailnotFound });
         }
 
+        if(!password>6) return res.status(404).json({message:"Please Enter Password 6+ Character..."});
+        
+
         const newUser = await User.create({
             userName,
             email,
@@ -41,11 +44,11 @@ export const CreateUser = async (req, res, next) => {
             status: status || "active",
             password: passwordHashed,
         });
-
        newUser.password=undefined;
-        return res.status(201).json({ message: auth?.userCreated, user: newUser });
+       const token=TokenGenerate(newUser?._id)
+        return res.status(201).json({ status:true,message: auth?.userCreated, user: newUser,token });
     } catch (error) {
-        return res.status(500).json({ message: codes?.InternalServerError?.message });
+        return res.status(500).json({ status:false,message: codes?.InternalServerError?.message });
     }
 };
 
@@ -60,18 +63,30 @@ export const Login = async (req, res, next) => {
             ]
     });
         if (!userNameOrEmailId || !password) {
-            return res.status(400).json({ message: auth?.UserNameorEmailPasswordarerequired });
+            return res.status(400).json({ status:false, message: auth?.UserNameorEmailPasswordarerequired });
         }
-        if(checkCurrentUser) {
-            const responseToken=TokenGenerate(checkCurrentUser?._id);
-            return res.status(200).json({message:auth?.LoginSuccessfull,token:responseToken});
-        }
-        else
-        {
-            return res.status(400).json({ message: auth?.UserNotFound });
-        }
+        const passwordCheck=await bcrypt.compare(password,checkCurrentUser?.password);
+        console.log(passwordCheck,'passwordCheck')
+        if(!passwordCheck) return res.status(404).json({status:false,message:"Password Is Wrong!.."})
+
+            if(passwordCheck)
+            {
+                if(checkCurrentUser ) {
+                    const responseToken=TokenGenerate(checkCurrentUser?._id);
+                    return res.status(200).json({status:true,message:auth?.LoginSuccessfull,token:responseToken});
+                }
+                else
+                {
+                    return res.status(400).json({ status:false,message: auth?.UserNotFound });
+                }
+            }
+            else{
+                return res.status(400).json({ status:false,message: auth?.UserNotFound });
+
+            }
+        
     } catch (error) {
-        return res.status(500).json({ message: codes?.InternalServerError?.message });
+        return res.status(500).json({ status:false,message: codes?.InternalServerError?.message });
     }
 };  
 
